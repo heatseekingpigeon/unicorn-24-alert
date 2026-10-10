@@ -34,4 +34,4 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add seen_products.txt
           git diff --staged --quiet || git commit -m "Update seen products list"
-          git.push
+          git push
