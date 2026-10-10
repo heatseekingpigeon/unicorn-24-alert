@@ -2,8 +2,8 @@ name: Check Pre-Owned Watches
 
 on:
   schedule:
-    - cron: '*/15 * * * *' # Runs automatically every 15 minutes
-  workflow_dispatch: # Allows you to trigger it manually anytime
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Set up Python
-        uses: setup-python@v4
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
           
