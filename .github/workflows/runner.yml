@@ -2,7 +2,7 @@ name: Check Pre-Owned Watches
 
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '*/17 * * * *'
   workflow_dispatch:
 
 permissions:
