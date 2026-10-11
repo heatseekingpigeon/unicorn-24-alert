@@ -35,7 +35,7 @@ def check_products():
         return
     
     products = data.get("products", [])
-    print(f"Fetched {len(products)} total products from site.")
+    print(f"Fetched {len(products)} total products from site. Seen file currently has {len(seen)} IDs.")
 
     for product in products:
         pid = str(product["id"])
@@ -46,13 +46,15 @@ def check_products():
         # Check if any variant is available
         available = any(v.get("available", False) for v in product.get("variants", []))
 
+        print(f"-> Checking: {title} | ID: {pid} | In Seen: {pid in seen} | Available: {available}")
+
         if pid not in seen:
             if available:
                 msg = f"🚨 <b>NEW PRE-OWNED WATCH DROP!</b>\n\n<b>{title}</b>\n\n🔗 {link}"
-                print(f"Sending alert for new watch: {title}")
+                print(f"--> SENDING ALERT for: {title}")
                 send_alert(msg)
             else:
-                print(f"Found new product but it is sold out/unavailable: {title}")
+                print(f"--> Sold out, skipping alert.")
             seen.add(pid)
 
     save_seen(seen)
