@@ -19,7 +19,8 @@ def save_seen(seen_set):
 
 def send_alert(message):
     telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    requests.post(telegram_url, json={"chat_id": CHAT_ID, "text": message, "parse_mode": "HTML"})
+    response = requests.post(telegram_url, json={"chat_id": CHAT_ID, "text": message, "parse_mode": "HTML"})
+    print(f"Telegram API Response: {response.status_code} - {response.text}")
 
 def check_products():
     seen = load_seen()
@@ -34,7 +35,7 @@ def check_products():
         return
     
     products = data.get("products", [])
-    is_first_run = len(seen) == 0
+    print(f"Fetched {len(products)} total products from site.")
 
     for product in products:
         pid = str(product["id"])
@@ -46,10 +47,12 @@ def check_products():
         available = any(v.get("available", False) for v in product.get("variants", []))
 
         if pid not in seen:
-            if not is_first_run and available:
+            if available:
                 msg = f"🚨 <b>NEW PRE-OWNED WATCH DROP!</b>\n\n<b>{title}</b>\n\n🔗 {link}"
-                print(f"New watch found: {title}")
+                print(f"Sending alert for new watch: {title}")
                 send_alert(msg)
+            else:
+                print(f"Found new product but it is sold out/unavailable: {title}")
             seen.add(pid)
 
     save_seen(seen)
