@@ -7,18 +7,20 @@ URL = "https://www.thornwatches.com/collections/pre-owned/products.json"
 SEEN_FILE = "seen_products.txt"
 
 def load_seen():
-    # Temporarily bypassed for testing so everything looks new!
+    if os.path.exists(SEEN_FILE):
+        with open(SEEN_FILE, "r") as f:
+            return set(line.strip() for line in f if line.strip())
     return set()
 
 def save_seen(seen_set):
     with open(SEEN_FILE, "w") as f:
-        for pid in seen_set:
+        for pid in sorted(seen_set):
             f.write(f"{pid}\n")
 
 def send_alert(message):
     telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     response = requests.post(telegram_url, json={"chat_id": CHAT_ID, "text": message, "parse_mode": "HTML"})
-    print(f"Telegram API Response: {response.status_code} - {response.text}")
+    print(f"Telegram API Response: {response.status_code}")
 
 def check_products():
     seen = load_seen()
@@ -33,7 +35,7 @@ def check_products():
         return
     
     products = data.get("products", [])
-    print(f"Fetched {len(products)} total products from site. Seen file currently has {len(seen)} IDs.")
+    print(f"Fetched {len(products)} total products from site. Currently tracking {len(seen)} seen IDs.")
 
     for product in products:
         pid = str(product["id"])
@@ -44,15 +46,11 @@ def check_products():
         # Check if any variant is available
         available = any(v.get("available", False) for v in product.get("variants", []))
 
-        print(f"-> Checking: {title} | ID: {pid} | In Seen: {pid in seen} | Available: {available}")
-
         if pid not in seen:
             if available:
                 msg = f"🚨 <b>NEW PRE-OWNED WATCH DROP!</b>\n\n<b>{title}</b>\n\n🔗 {link}"
-                print(f"--> SENDING ALERT for: {title}")
+                print(f"Sending alert for new watch: {title}")
                 send_alert(msg)
-            else:
-                print(f"--> Sold out, skipping alert.")
             seen.add(pid)
 
     save_seen(seen)
