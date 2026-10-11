@@ -7,9 +7,7 @@ URL = "https://www.thornwatches.com/collections/pre-owned/products.json"
 SEEN_FILE = "seen_products.txt"
 
 def load_seen():
-    if os.path.exists(SEEN_FILE):
-        with open(SEEN_FILE, "r") as f:
-            return set(line.strip() for line in f if line.strip())
+    # Temporarily bypassed for testing so everything looks new!
     return set()
 
 def save_seen(seen_set):
